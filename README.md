@@ -6,6 +6,9 @@
 
 [실시간 웹 프로토타입 확인하기 (GitHub Pages)](https://bobong0111.github.io/toss-challenge-2026/)
 
+### 서비스 플로우
+![서비스 플로우](images/service_flow.png)
+
 ---
 
 ## 프로젝트 주요 특징 및 구현 기능
