@@ -511,7 +511,12 @@ function initializeDefaultScheduleData() {
         const relativeKey = parts[1] || parts[0];
         
         if (relativeKey === '0-0' || relativeKey === '0-1') {
-            p1CustomSchedules[slotKey] = { title: '대행사 미팅', category: 'meeting', color: '#f97316' };
+            p1CustomSchedules[slotKey] = { 
+                title: '대행사 미팅', 
+                category: 'meeting', 
+                color: '#f97316',
+                memo: '대행사 직원 2명 방문예정\n@김토스 @박디자 @정디자'
+            };
         } else if (relativeKey === '2-4' || relativeKey === '2-5' || relativeKey === '2-6') {
             p1CustomSchedules[slotKey] = { title: '삼성역 미팅 (외근)', category: 'out', color: '#f04452' };
         } else {
@@ -826,40 +831,6 @@ let currentDisplayedYear = today.getFullYear();
 let currentDisplayedMonth = today.getMonth();
 let startOffsetDay = getMondayOf(selectedDate).getDate();
 
-// Recreate "삼성역 미팅 (외근)" (Wednesday 13-16) if missing
-try {
-    const tempDate = getInitialDate();
-    const tempMonday = getMondayOf(tempDate);
-    const tempMondayStr = formatDate(tempMonday);
-    
-    let currentSchedules = JSON.parse(localStorage.getItem('toss_schedule_data') || '{}');
-    let currentCustom = JSON.parse(localStorage.getItem('toss_p1_custom_schedules') || '{}');
-    let userCustom = JSON.parse(localStorage.getItem('toss_user_custom_schedules') || '{}');
-    
-    if (!currentSchedules['p1']) currentSchedules['p1'] = [];
-    
-    const targetSlots = ['2-4', '2-5', '2-6'];
-    let needsRecreate = targetSlots.some(s => !currentSchedules['p1'].includes(`${tempMondayStr}:${s}`));
-    
-    if (needsRecreate) {
-        targetSlots.forEach(s => {
-            const key = `${tempMondayStr}:${s}`;
-            if (!currentSchedules['p1'].includes(key)) {
-                currentSchedules['p1'].push(key);
-            }
-            const meetingDetails = { title: '삼성역 미팅 (외근)', category: 'out', color: '#f04452' };
-            currentCustom[key] = meetingDetails;
-            userCustom[key] = meetingDetails;
-        });
-        
-        localStorage.setItem('toss_schedule_data', JSON.stringify(currentSchedules));
-        localStorage.setItem('toss_p1_custom_schedules', JSON.stringify(currentCustom));
-        localStorage.setItem('toss_user_custom_schedules', JSON.stringify(userCustom));
-    }
-} catch(e) {
-    console.error("Error recreating Samsung meeting:", e);
-}
-
 // Initialize with normal scenario
 if (loadScheduleDataFromLocalStorage()) {
     // Force delete only Friday "연차" and "개인 일정" custom schedules, and remove from scheduleData[currentUserId]
@@ -875,6 +846,38 @@ if (loadScheduleDataFromLocalStorage()) {
 } else {
     scheduleData = SCENARIOS[currentScenario].busySlots;
     resetP1CustomSchedules();
+}
+
+// Recreate "삼성역 미팅 (외근)" (Wednesday 13-16) if missing
+try {
+    const tempDate = getInitialDate();
+    const tempMonday = getMondayOf(tempDate);
+    const tempMondayStr = formatDate(tempMonday);
+    
+    if (!scheduleData['p1']) scheduleData['p1'] = [];
+    
+    const targetSlots = ['2-4', '2-5', '2-6'];
+    let needsRecreate = targetSlots.some(s => !scheduleData['p1'].includes(`${tempMondayStr}:${s}`));
+    
+    if (needsRecreate) {
+        targetSlots.forEach(s => {
+            const key = `${tempMondayStr}:${s}`;
+            if (!scheduleData['p1'].includes(key)) {
+                scheduleData['p1'].push(key);
+            }
+            const meetingDetails = { title: '삼성역 미팅 (외근)', category: 'out', color: '#f04452' };
+            p1CustomSchedules[key] = meetingDetails;
+            
+            // Also update userCustom in localStorage
+            let userCustom = JSON.parse(localStorage.getItem('toss_user_custom_schedules') || '{}');
+            userCustom[key] = meetingDetails;
+            localStorage.setItem('toss_user_custom_schedules', JSON.stringify(userCustom));
+        });
+        
+        saveScheduleDataToLocalStorage();
+    }
+} catch(e) {
+    console.error("Error recreating Samsung meeting:", e);
 }
 
 // Navigation & Back button History API support
@@ -1462,9 +1465,7 @@ function setupHeaderUtilities() {
         const btnAddExcludeTime = document.getElementById('btn-add-exclude-time');
 
         if (excludeTimesList && btnAddExcludeTime) {
-            let excludeTimes = JSON.parse(localStorage.getItem('toss_exclude_times')) || [
-                { start: '16', end: '17' }
-            ];
+            let excludeTimes = JSON.parse(localStorage.getItem('toss_exclude_times')) || [];
 
             const renderExcludeTimes = () => {
                 excludeTimesList.innerHTML = '';
@@ -1851,9 +1852,9 @@ function isDayPassed(dayIdx) {
 function getExcludeTimes() {
     try {
         const stored = localStorage.getItem('toss_exclude_times');
-        return stored ? JSON.parse(stored) : [{ start: '16', end: '17' }];
+        return stored ? JSON.parse(stored) : [];
     } catch (e) {
-        return [{ start: '16', end: '17' }];
+        return [];
     }
 }
 
