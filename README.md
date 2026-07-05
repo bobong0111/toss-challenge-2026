@@ -3,7 +3,7 @@
 토스 디자이너 챌린지 2026 과제 제출을 위한 시간 조율 서비스 웹 프로토타입 저장소입니다.  
 사용자 친화적이고 직관적인 토스 고유의 디자인 시스템을 반영하여 설계 및 개발되었습니다.
 
-👉 **[실시간 웹 프로토타입 확인하기 (GitHub Pages)]**(https://simbo-eun.github.io/toss-challenge-2026/) *(배포 후 생성되는 본인의 URL 주소를 여기에 넣어주세요)*
+👉 **[실시간 웹 프로토타입 확인하기 (GitHub Pages)]**(https://bobong0111.github.io/toss-challenge-2026/)
 
 ---
 
