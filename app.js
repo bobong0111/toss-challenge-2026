@@ -2274,7 +2274,7 @@ function renderRecommendationsList(recs, slotsNeeded) {
                 pollCard.className = 'recommendation-poll-card';
                 pollCard.id = 'btn-start-poll';
                 pollCard.innerHTML = `
-                    <img src="airplane.png" alt="ask all" style="width: 24px; height: 24px; object-fit: contain; flex-shrink: 0;">
+                    <img src="images/airplane.png" alt="ask all" style="width: 24px; height: 24px; object-fit: contain; flex-shrink: 0;">
                     <span style="font-size: 13px; font-weight: 700; color: var(--color-blue);">모두에게 물어보기</span>
                 `;
                 pollCard.addEventListener('click', (e) => {
@@ -2296,7 +2296,7 @@ function renderRecommendationsList(recs, slotsNeeded) {
                 pollCard.style.color = 'var(--color-blue)';
                 pollCard.style.cursor = 'default';
                 pollCard.innerHTML = `
-                    <img src="check.png" alt="completed" style="width: 24px; height: 24px; object-fit: contain; flex-shrink: 0;">
+                    <img src="images/check.png" alt="completed" style="width: 24px; height: 24px; object-fit: contain; flex-shrink: 0;">
                     <span style="font-size: 13px; font-weight: 700; color: var(--color-blue);">투표 취합 완료</span>
                 `;
             }
@@ -2581,7 +2581,7 @@ function showParticipantCompleteModal() {
     overlay.className = 'vote-preview-overlay';
     overlay.innerHTML = `
         <div class="vote-preview-modal" style="text-align: center; padding: 32px 24px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <img src="envelope.png" alt="complete" style="width: 56px; height: 56px; object-fit: contain; flex-shrink: 0; margin-bottom: 16px;">
+            <img src="images/envelope.png" alt="complete" style="width: 56px; height: 56px; object-fit: contain; flex-shrink: 0; margin-bottom: 16px;">
             <h3 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">응답이 전달되었어요.</h3>
             <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin: 0 0 24px 0;">회의 시간이 확정되면<br>알림으로 안내해드릴게요.</p>
             <button type="button" class="btn btn-primary" id="btn-complete-modal-close" style="width: 100%; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 600; background-color: var(--color-blue); color: #ffffff; border: none; cursor: pointer;">확인</button>
@@ -5294,8 +5294,8 @@ function setupWizard() {
         customChip.style.whiteSpace = 'nowrap';
         
         const iconHtml = tpl.name === '1:1 면담'
-            ? `<img src="chat_bubble.png" class="wiz-tpl-icon no-invert" alt="chat">`
-            : `<img src="bookmark.png" class="wiz-tpl-icon" alt="bookmark">`;
+            ? `<img src="images/chat_bubble.png" class="wiz-tpl-icon no-invert" alt="chat">`
+            : `<img src="images/bookmark.png" class="wiz-tpl-icon" alt="bookmark">`;
 
         customChip.innerHTML = `
             <span>${iconHtml}${tpl.name}</span>
