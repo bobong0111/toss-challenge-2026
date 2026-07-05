@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>toss align - 모두의 일정을 쉽고 간단하게</title>
+    <meta name="description" content="토스 Product Designer Challenge 2026 과제: 6명의 동료가 1시간 회의 일정을 잡는 스마트하고 직관적인 일정 조율 솔루션">
+    
+    <!-- Pretendard Font Link -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="styles.css?v=230">
+    <style>
+        .mypage-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 4px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-sm);
+            outline: none;
+        }
+        .mypage-nav-btn:hover {
+            background-color: rgba(49, 130, 246, 0.05) !important;
+            border-color: rgba(49, 130, 246, 0.3) !important;
+            transform: translateY(-1px);
+        }
+        .mypage-nav-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-page" class="login-container">
+        <div class="login-card">
+            <div class="login-logo">
+                <img src="toss_logo.png" alt="Toss Align Logo" class="login-logo-img">
+            </div>
+            <p class="login-subtitle">모두의 일정을 쉽고 간단하게</p>
+            
+            <form class="login-form" id="login-form">
+                <!-- Username / Email Input -->
+                <div class="login-input-field-group">
+                    <label for="login-username">아이디 또는 이메일</label>
+                    <input type="text" id="login-username" placeholder="아이디 또는 이메일을 입력하세요" autocomplete="off" required>
+                </div>
+                
+                <!-- Password Input -->
+                <div class="login-input-field-group">
+                    <label for="login-password">비밀번호</label>
+                    <input type="password" id="login-password" placeholder="비밀번호를 입력하세요" required>
+                </div>
+                
+                <!-- Remember me / Options -->
+                <div class="login-options-row" style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-secondary); margin-top: -8px; user-select: none;">
+                    <label class="login-checkbox-label" style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; margin-bottom: 0; color: var(--text-secondary);">
+                        <input type="checkbox" id="login-remember-me" checked style="width: 16px; height: 16px; accent-color: var(--color-blue);">
+                        로그인 상태 유지
+                    </label>
+                    <a href="#" style="color: var(--color-blue); text-decoration: none; font-weight: 600;">비밀번호 재설정</a>
+                </div>
+                
+                <button type="submit" class="btn-login-submit" id="btn-login-submit" style="margin-top: 12px;">로그인하기</button>
+            </form>
+
+            <!-- Quick Login Chooser (Default Hidden) -->
+            <div id="quick-login-container" style="display: none; flex-direction: column; align-items: center; gap: 16px; width: 100%; margin-top: 24px;">
+                <button type="button" id="btn-quick-login" class="quick-login-card-btn" style="width: 100%; display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; cursor: pointer; text-align: left; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.03); outline: none;">
+                    <!-- Avatar -->
+                    <div style="position: relative; flex-shrink: 0; width: 44px; height: 44px;">
+                        <div class="quick-profile-badge" style="width: 100%; height: 100%; border-radius: 50%; background-color: var(--color-blue); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700;">
+                            김
+                        </div>
+                    </div>
+                    <!-- Profile Info -->
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <span id="quick-login-name" style="font-size: 15px; font-weight: 700; color: var(--text-primary); line-height: 1.2;">김토스</span>
+                        <span id="quick-login-email" style="font-size: 12px; color: var(--text-secondary); line-height: 1.2;">디자인1팀 / 팀장</span>
+                    </div>
+                </button>
+                <button type="button" id="btn-switch-account" style="background: none; border: none; color: var(--color-blue); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-top: 4px;">다른 계정으로 로그인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workspace Landing Page -->
+    <div id="workspace-landing" class="app-container" style="display: none;">
+        <!-- Sidebar: Setup Form -->
+        <aside class="sidebar" aria-label="회의 설정 및 참석자 검색">
+            <div class="sidebar-header" style="display: flex; align-items: center; gap: 8px;">
+                <div class="toss-logo-row" style="margin-bottom: 0;">
+                    <img src="toss_logo.png" alt="Toss Logo" class="toss-logo-img">
+                </div>
+                <div style="padding-left: 4px; display: flex; align-items: center;">
+                    <p class="subtitle" style="margin-top: 0; white-space: nowrap; line-height: 1;">모두의 일정을 쉽고 간단하게</p>
+                </div>
+            </div>
+            
+            <div class="sidebar-body">
+                <div class="wiz-templates-container" style="margin-bottom: 12px; user-select: none;">
+                    <div class="wiz-templates-row" id="wiz-templates-row" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; align-items: center;">
+                        <button type="button" class="wiz-template-chip" data-type="1on1" style="white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;"><img src="chat_bubble.png" class="wiz-tpl-icon no-invert" alt="chat">1:1 면담</button>
+                        <button type="button" id="btn-add-template" class="wiz-template-chip add-btn" style="color: var(--color-blue); border-color: rgba(49, 130, 246, 0.3); background-color: rgba(49, 130, 246, 0.05); font-weight: 700; white-space: nowrap; flex-shrink: 0;" title="템플릿 추가">+ 추가</button>
+                    </div>
+                </div>
+                
+                <!-- Setup Wizard Form -->
+                <form class="wizard-form" id="wizard-form" style="display: flex; flex-direction: column; gap: 16px;">
+                    <!-- Combined Sidebar Card -->
+                    <section class="card" style="display: flex; flex-direction: column; gap: 24px; padding: 24px; margin-bottom: 0;">
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
+                            <label for="wiz-meeting-name">회의 이름</label>
+                            <input type="text" id="wiz-meeting-name" value="" placeholder="회의 이름을 입력해주세요.">
+                        </div>
+                        
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
+                            <label>회의 시간</label>
+                            <div class="duration-segmented-control" id="wiz-duration-selector">
+                                <button type="button" class="duration-segment-btn" data-value="30">30분</button>
+                                <button type="button" class="duration-segment-btn active" data-value="60">1시간</button>
+                                <button type="button" class="duration-segment-btn" data-value="120">2시간</button>
+                                <button type="button" class="duration-segment-btn" data-value="custom" id="wiz-btn-custom-duration">직접 입력</button>
+                            </div>
+                            <div class="custom-duration-wrapper" id="wiz-custom-duration-wrapper" style="display: none; margin-top: 8px;">
+                                <div class="custom-duration-input-container">
+                                    <input type="number" id="wiz-custom-duration-input" min="10" max="480" step="10" placeholder="예: 90" value="90">
+                                    <span class="custom-duration-suffix">분</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Divider Line -->
+                        <div style="border-top: 1px solid var(--border-color);"></div>
+                        
+                        <div class="form-group" style="position: relative; display: flex; flex-direction: column; gap: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <label style="margin: 0;">참석자 선택</label>
+                                <button type="button" id="btn-wiz-reset" class="wiz-template-chip" style="color: var(--color-blue); border-color: rgba(49, 130, 246, 0.3); background-color: rgba(49, 130, 246, 0.05); font-weight: 700; white-space: nowrap; flex-shrink: 0; padding: 4px 12px; height: auto; font-size: 11px; border-radius: 9999px; margin: 0; cursor: pointer; transition: all 0.2s;" title="설정 초기화">RESET</button>
+                            </div>
+                            
+                            <!-- Search Trigger Button -->
+                            <div class="wiz-search-trigger-container" style="position: relative; margin-top: 4px; width: 100%;">
+                                <button type="button" class="btn-wiz-search-trigger" id="btn-wiz-search-trigger" style="width: 100%;">
+                                    <img src="search_magnifier.png" alt="search" style="width: 1.2em; height: 1.2em; object-fit: contain;"> 이름으로 검색
+                                </button>
+                                
+                                <!-- Floating Search Popup Dropdown -->
+                                <div class="wiz-search-popup" id="wiz-search-popup" style="display: none; left: 0; width: 100%;">
+                                    <div class="wiz-search-popup-header">
+                                        <input type="text" id="wiz-search-input" placeholder="이름 또는 팀으로 검색" autocomplete="off">
+                                        <button type="button" class="btn-wiz-search-close" id="btn-wiz-search-close">✕</button>
+                                    </div>
+                                    <div class="wiz-search-results" id="wiz-search-results">
+                                        <!-- Filled dynamically via JS -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Selected Attendees Grid (1-column layout) -->
+                            <div class="wiz-participants-grid" id="wiz-participants-grid" style="margin-top: 4px;">
+                                <!-- Filled dynamically via JS -->
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Action Button -->
+                    <button type="button" id="btn-wiz-submit" class="btn-wizard-submit" style="margin-top: 0;">회의 시간 찾기</button>
+                </form>
+            </div>
+        </aside>
+        
+        <!-- Main Content Area: Personal Calendar Editor -->
+        <main class="main-content">
+            <!-- Top Utility Bar -->
+            <header class="top-bar">
+                <div class="meeting-summary" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <strong id="personal-calendar-title" style="font-size: 15px; font-weight: 700; color: var(--text-primary);">김토스님의 일정</strong>
+                    
+                    <!-- Integrated Sync Badge -->
+                    <span class="badge-sync-status" style="background-color: var(--bg-color-hover, #f2f4f6); color: var(--text-secondary); border-radius: 6px; padding: 3px 8px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border-color); user-select: none; transition: opacity 0.2s;">
+                        <span class="sync-dot" style="display: inline-block; width: 5px; height: 5px; background-color: var(--color-green); border-radius: 50%;"></span>
+                        Google · Slack 연결됨
+                    </span>
+                </div>
+                <div class="header-actions" style="display: flex; gap: 16px; align-items: center;">
+                    <button type="button" class="btn-utility-bell" style="position: relative; background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-primary); transition: transform 0.2s; padding: 4px; display: flex; align-items: center; justify-content: center;" title="알림 센터">
+                        <img src="bell.png" alt="notifications" style="width: 1.2em; height: 1.2em; object-fit: contain;">
+                        <span class="bell-red-badge" style="position: absolute; top: 1px; right: 1px; width: 6px; height: 6px; border-radius: 50%; background-color: #f04452; border: 1px solid var(--card-bg); display: none;"></span>
+                    </button>
+                    <!-- User Avatar Profile -->
+                    <button type="button" class="btn-utility-profile" style="width: 28px; height: 28px; border-radius: 50%; background-color: var(--color-blue); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; border: none; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 6px rgba(49, 130, 246, 0.2);" title="내 설정 및 계정">
+                        김
+                    </button>
+                </div>
+            </header>
+            
+            <!-- Calendar Workspace -->
+            <div class="workspace-layout">
+                <section class="calendar-section" style="flex-grow: 1; display: flex; flex-direction: column; height: 100%;">
+                    <div class="calendar-header-row">
+                        <!-- Week Navigation in place of title -->
+                        <div class="week-nav-container" style="display: flex; align-items: center; gap: 4px; background: transparent; padding: 4px 0; border: none; width: fit-content; user-select: none;">
+                            <button type="button" class="btn-nav-week" id="btn-wiz-prev-week" style="background: none; border: none; cursor: pointer; font-size: 14px; padding: 2px 8px; color: var(--text-secondary); font-weight: 700;">&lt;</button>
+                             <span id="wiz-week-label" style="font-size: 14px; font-weight: 700; color: var(--text-primary); min-width: 180px; text-align: center; white-space: nowrap;">2026년 6월 29일 - 7월 3일</span>
+                            <button type="button" class="btn-nav-week" id="btn-wiz-next-week" style="background: none; border: none; cursor: pointer; font-size: 14px; padding: 2px 8px; color: var(--text-secondary); font-weight: 700;">&gt;</button>
+                        </div>
+                        <div class="legend" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                            <span class="legend-item"><span class="legend-color" style="background-color: var(--card-bg); border: 1px solid var(--border-color);"></span>비어있음</span>
+                            <span class="legend-item"><span class="legend-color" style="background-color: #3182f6; border: 1px solid #3182f6;"></span>업무</span>
+                            <span class="legend-item"><span class="legend-color" style="background-color: #a855f7; border: 1px solid #a855f7;"></span>개인 일정</span>
+                            <span class="legend-item"><span class="legend-color" style="background-color: #f97316; border: 1px solid #f97316;"></span>미팅</span>
+                            <span class="legend-item"><span class="legend-color" style="background-color: #f04452; border: 1px solid #f04452;"></span>외근</span>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-wrapper" style="flex-grow: 1;">
+                        <div class="calendar-grid" id="my-workspace-calendar-grid">
+                            <!-- Filled dynamically via JS -->
+                        </div>
+                    </div>
+                    
+                    <p style="font-size: 11px; color: var(--text-tertiary); margin-top: 12px; text-align: left; display: flex; align-items: center; gap: 4px;"><img src="lightbulb.png" alt="tips" style="width: 1.2em; height: 1.2em; object-fit: contain; flex-shrink: 0;"> 빈 시간을 선택해 일정을 만들어보세요.</p>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div id="coordination-dashboard" class="app-container" style="display: none;">
+        <!-- Sidebar: Participants and Parameters -->
+        <aside class="sidebar" aria-label="회의 설정 및 참석자 목록">
+            <div class="sidebar-header" style="display: flex; align-items: center; gap: 8px;">
+                <div class="toss-logo-row" style="margin-bottom: 0;">
+                    <img src="toss_logo.png" alt="Toss Logo" class="toss-logo-img">
+                </div>
+                <div style="padding-left: 4px; display: flex; align-items: center;">
+                    <p class="subtitle" style="margin-top: 0; white-space: nowrap; line-height: 1;">모두의 일정을 쉽고 간단하게</p>
+                </div>
+            </div>
+
+            <div class="sidebar-body">
+
+
+                <!-- Meeting Info Card -->
+                <section class="config-card card" id="config-card-section" aria-labelledby="meeting-config-title">
+                    <div class="form-group" style="margin-top: 0;">
+                        <label for="meeting-name">회의 이름</label>
+                        <input type="text" id="meeting-name" value="" placeholder="회의 이름을 입력해주세요.">
+                    </div>
+                    <div class="form-group">
+                        <label>회의 시간</label>
+                        <div class="duration-segmented-control" id="duration-selector">
+                            <button type="button" class="duration-segment-btn" data-value="30">30분</button>
+                            <button type="button" class="duration-segment-btn active" data-value="60">1시간</button>
+                            <button type="button" class="duration-segment-btn" data-value="120">2시간</button>
+                            <button type="button" class="duration-segment-btn" data-value="custom" id="btn-custom-duration">직접 입력</button>
+                        </div>
+                        
+                        <div class="custom-duration-wrapper" id="custom-duration-wrapper" style="display: none; margin-top: 8px;">
+                            <div class="custom-duration-input-container">
+                                <input type="number" id="custom-duration-input" min="10" max="480" step="10" placeholder="예: 90" value="90">
+                                <span class="custom-duration-suffix">분</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden select for backward compatibility -->
+                        <select id="meeting-duration" style="display: none;">
+                            <option value="30">30분</option>
+                            <option value="60" selected>1시간</option>
+                            <option value="90">1시간 30분</option>
+                            <option value="120">2시간</option>
+                            <option value="180">3시간</option>
+                            <option value="240">4시간</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- Participant List Card -->
+                <section class="participants-card card" aria-labelledby="participants-title">
+                    <div class="participants-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <h2 id="participants-title" class="section-title" style="margin: 0;">참석자 (<span id="participant-count">6</span>명)</h2>
+                    </div>
+                    
+                    <div id="participants-list" class="participants-list" role="list">
+                        <!-- Hydrated via JavaScript (O/X style status selectors) -->
+                    </div>
+                </section>
+
+                <!-- Back Button -->
+                <button type="button" class="btn-back-to-setup" id="btn-back-to-setup" style="margin-top: 0; margin-bottom: 0;" title="이전으로">
+                    ← 이전으로
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Utility Bar -->
+            <header class="top-bar">
+                <div class="meeting-summary">
+                    <span class="badge badge-blue" id="duration-badge">1시간 회의</span>
+                    <strong id="summary-text">동료들의 일정을 분석하여 최적의 시간을 계산하는 중입니다.</strong>
+                </div>
+                <div class="header-actions" style="display: flex; gap: 16px; align-items: center;">
+                    <button type="button" class="btn btn-secondary" id="btn-toggle-my-schedule" style="font-size: 12px; padding: 6px 12px; display: none; align-items: center; gap: 4px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--text-primary); cursor: pointer; font-weight: 600; transition: background-color 0.2s;">
+                        <span style="font-size: 13px;">👤</span> <span id="btn-toggle-text">내 일정 관리</span>
+                    </button>
+                    <button type="button" class="btn-utility-bell" style="position: relative; background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-primary); transition: transform 0.2s; padding: 4px; display: flex; align-items: center; justify-content: center;" title="알림 센터">
+                        <img src="bell.png" alt="notifications" style="width: 1.2em; height: 1.2em; object-fit: contain;">
+                        <span class="bell-red-badge" style="position: absolute; top: 1px; right: 1px; width: 6px; height: 6px; border-radius: 50%; background-color: #f04452; border: 1px solid var(--card-bg); display: none;"></span>
+                    </button>
+                    <!-- User Avatar Profile -->
+                    <button type="button" class="btn-utility-profile" style="width: 28px; height: 28px; border-radius: 50%; background-color: var(--color-blue); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; border: none; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 6px rgba(49, 130, 246, 0.2);" title="내 설정 및 계정">
+                        김
+                    </button>
+                </div>
+            </header>
+
+            <!-- Workspace Layout (Unified page - no tabs) -->
+            <div class="workspace-layout">
+                <!-- Top Section: Recommendations (Horizontal Row) -->
+                <section class="recommendations-section" aria-labelledby="rec-section-title">
+                    <div id="recommendations-container" class="recommendations-row">
+                        <!-- Hydrated via JavaScript -->
+                    </div>
+                </section>
+
+                <!-- Bottom Section: Calendar Grid and Sidebar detail panel -->
+                <section class="calendar-section" aria-labelledby="cal-section-title">
+                    <div class="calendar-header-row">
+                        <h2 id="cal-section-title" class="layout-section-title">참석 가능 현황</h2>
+                    </div>
+
+                    <div class="calendar-layout-container">
+                        <div class="calendar-wrapper">
+                            <div id="calendar-grid" class="calendar-grid">
+                                <!-- Hydrated via JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <!-- Slot Detail Sidebar Panel -->
+                        <aside id="calendar-detail-panel" class="calendar-detail-panel">
+                            <div class="detail-panel-placeholder">
+                                <img src="colleagues.png" alt="colleagues" class="placeholder-icon">
+                                <p>시간을 선택하면 참석 가능한<br>동료를 보여드려요.</p>
+                            </div>
+                            <div id="detail-panel-content" class="detail-panel-content" style="display: none;">
+                                <!-- Hydrated via JavaScript -->
+                            </div>
+                            <!-- Persistent Submit Button in Participant Mode -->
+                            <div id="participant-submit-container" style="display: none; padding-top: 16px; border-top: 1px solid var(--border-color); background-color: var(--card-bg); width: 100%; box-sizing: border-box; flex-direction: column; gap: 8px;">
+                                <button id="btn-participant-submit-all" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 700; font-size: 14px; border-radius: 12px; cursor: pointer; transition: all 0.2s;" disabled>
+                                    시간 선택 완료하고 전달하기
+                                </button>
+                            </div>
+                        </aside>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Calendar Popover Popup (floating globally) -->
+    <div class="calendar-popup" id="calendar-popup" style="display: none;">
+        <div class="cal-pop-header">
+            <button type="button" class="btn-cal-nav" id="btn-prev-month" aria-label="이전 달">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <div class="cal-pop-title">
+                <span class="title-year">2026년</span>
+                <span class="title-month">7월</span>
+            </div>
+            <button type="button" class="btn-cal-nav" id="btn-next-month" aria-label="다음 달">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+        </div>
+        
+        <div class="cal-pop-body">
+            <div class="cal-pop-weekdays">
+                <div style="color: var(--color-red);">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div style="color: var(--color-blue);">토</div>
+            </div>
+            
+            <div class="cal-pop-dates-grid" id="cal-pop-dates">
+                <!-- Dates rendered dynamically via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Confirmation Dialog (Modern HTML5 Dialog) -->
+    <dialog id="booking-dialog" class="toss-dialog">
+        <div class="dialog-content">
+            <button class="btn-close-dialog" aria-label="닫기">✕</button>
+            <div class="dialog-header">
+                <span class="success-icon" aria-hidden="true">🎉</span>
+                <h2>회의 예약 확인</h2>
+            </div>
+            <div class="dialog-body">
+                <p>선택하신 시간으로 일정을 예약할까요?</p>
+                    </div>
+            <div class="dialog-footer">
+                <button id="btn-dialog-cancel" class="btn btn-secondary">취소</button>
+                <button id="btn-dialog-confirm" class="btn btn-primary">회의 등록하기</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Template Application Modal (Overlay) -->
+    <div id="template-apply-dialog" class="toss-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center;">
+        <div class="toss-dialog" style="position: relative; width: 460px; max-width: 90%; background: var(--card-bg); border-radius: 20px; box-shadow: var(--shadow-lg); overflow: hidden;">
+            <div class="dialog-content" style="padding: 32px;">
+                <button type="button" class="btn-close-dialog" id="btn-close-apply-dialog" aria-label="닫기">✕</button>
+                <div class="dialog-header" style="text-align: center; margin-bottom: 16px;">
+                    <h2 id="apply-tpl-title" style="font-size: 20px; font-weight: 700;">템플릿 적용</h2>
+                </div>
+                <div class="dialog-body" style="margin-bottom: 20px; text-align: left; max-height: 280px; overflow-y: auto; padding-right: 6px; display: flex; flex-direction: column; gap: 12px;">
+                    <!-- 1. Search trigger styled identical to the sidebar search at the top -->
+                    <div class="tpl-search-trigger-container" style="position: relative; width: 100%;">
+                        <button type="button" class="btn-wiz-search-trigger" id="btn-tpl-search-trigger" style="width: 100%;">
+                            <img src="search_magnifier.png" alt="search" style="width: 1.2em; height: 1.2em; object-fit: contain;"> 이름으로 검색
+                        </button>
+                        
+                        <!-- Inline Relative Dropdown inside the popup -->
+                        <div class="wiz-search-popup" id="tpl-search-popup" style="display: none; position: relative; width: 100%; box-shadow: none; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; box-sizing: border-box; margin-top: 8px; z-index: 10;">
+                            <div class="wiz-search-popup-header" style="display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 8px;">
+                                <input type="text" id="tpl-search-input" placeholder="이름 또는 팀으로 검색" autocomplete="off" style="border: none; outline: none; background: transparent; font-size: 13px; flex-grow: 1; color: var(--text-primary); width: 100%;">
+                                <button type="button" class="btn-wiz-search-close" id="btn-tpl-search-close" style="background: none; border: none; font-size: 14px; cursor: pointer; color: var(--text-secondary);">✕</button>
+                            </div>
+                            <div class="wiz-search-results" id="tpl-search-results" style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;">
+                                <!-- Filled dynamically via JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Subtitle '참석자 명단' -->
+                    <label style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block;">참석자 명단</label>
+
+                    <!-- 3. Selected attendee cards list at the bottom -->
+                    <div id="apply-tpl-selected-list" style="display: grid; grid-template-columns: 1fr; gap: 10px; padding: 0; border: none; background: transparent;">
+                        <!-- Filled with selected colleague cards dynamically (sidebar styled cards) -->
+                    </div>
+                </div>
+                <div class="dialog-footer" style="display: flex; justify-content: flex-end; gap: 8px;">
+                    <button type="button" id="btn-cancel-apply" class="btn btn-secondary" style="border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 20px; background: var(--bg-color); color: var(--text-primary); font-weight: 600; cursor: pointer;">취소</button>
+                    <button type="button" id="btn-submit-apply" class="btn btn-primary" style="border: none; border-radius: 12px; padding: 12px 20px; background: var(--color-blue); color: #ffffff; font-weight: 600; cursor: pointer;">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Template Creation Modal (Overlay) -->
+    <div id="custom-template-dialog" class="toss-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center;">
+        <div class="toss-dialog" style="position: relative; width: 460px; max-width: 90%; background: var(--card-bg); border-radius: 20px; box-shadow: var(--shadow-lg); overflow: hidden;">
+            <div class="dialog-content" style="padding: 32px;">
+                <button type="button" class="btn-close-dialog" id="btn-close-template-dialog" aria-label="닫기">✕</button>
+                <form id="template-creation-form" style="display: flex; flex-direction: column; gap: 12px;">
+                    <!-- Scrollable dialog body to contain all field settings -->
+                    <div class="dialog-body" style="max-height: 320px; overflow-y: auto; padding-right: 6px; display: flex; flex-direction: column; gap: 16px;">
+                        <div class="form-group">
+                            <label for="tpl-chip-name" style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block;">회의 이름</label>
+                            <input type="text" id="tpl-chip-name" autocomplete="off" placeholder="회의 이름을 입력해주세요." required style="width: 100%; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; background: var(--bg-color); color: var(--text-primary); outline: none;">
+                        </div>
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
+                            <label style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 0; display: block;">회의 시간</label>
+                            <div class="duration-segmented-control" id="tpl-add-duration-selector">
+                                <button type="button" class="duration-segment-btn" data-value="30">30분</button>
+                                <button type="button" class="duration-segment-btn active" data-value="60">1시간</button>
+                                <button type="button" class="duration-segment-btn" data-value="120">2시간</button>
+                                <button type="button" class="duration-segment-btn" data-value="custom" id="tpl-add-btn-custom-duration">직접 입력</button>
+                            </div>
+                            <div class="custom-duration-wrapper" id="tpl-add-custom-duration-wrapper" style="display: none; margin-top: 8px;">
+                                <div class="custom-duration-input-container">
+                                    <input type="number" id="tpl-add-custom-duration-input" min="10" max="480" step="10" placeholder="예: 90" value="90">
+                                    <span class="custom-duration-suffix">분</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Divider Line -->
+                        <div style="border-top: 1px solid var(--border-color); margin: 4px 0;"></div>
+                        
+                        <div class="form-group" style="position: relative; display: flex; flex-direction: column; gap: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <label style="margin: 0; font-size: 13px; font-weight: 600; color: var(--text-secondary);">참석자 선택</label>
+                                <button type="button" id="btn-tpl-add-reset" class="wiz-template-chip" style="color: var(--color-blue); border-color: rgba(49, 130, 246, 0.3); background-color: rgba(49, 130, 246, 0.05); font-weight: 700; white-space: nowrap; flex-shrink: 0; padding: 4px 12px; height: auto; font-size: 11px; border-radius: 9999px; margin: 0; cursor: pointer; transition: all 0.2s;" title="참석자 초기화">RESET</button>
+                            </div>
+                            
+                            <!-- Search trigger styled identical to the sidebar search at the top -->
+                            <div class="tpl-add-search-trigger-container" style="position: relative; width: 100%; margin-top: 4px;">
+                                <button type="button" class="btn-wiz-search-trigger" id="btn-tpl-add-search-trigger" style="width: 100%;">
+                                    <img src="search_magnifier.png" alt="search" style="width: 1.2em; height: 1.2em; object-fit: contain;"> 이름으로 검색
+                                </button>
+                                
+                                <!-- Inline Relative Dropdown inside the popup -->
+                                <div class="wiz-search-popup" id="tpl-add-search-popup" style="display: none; position: relative; width: 100%; box-shadow: none; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; box-sizing: border-box; margin-top: 8px; z-index: 10;">
+                                    <div class="wiz-search-popup-header" style="display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 8px;">
+                                        <input type="text" id="tpl-add-search-input" placeholder="이름 또는 팀으로 검색" autocomplete="off" style="border: none; outline: none; background: transparent; font-size: 13px; flex-grow: 1; color: var(--text-primary); width: 100%;">
+                                        <button type="button" class="btn-wiz-search-close" id="btn-tpl-add-search-close" style="background: none; border: none; font-size: 14px; cursor: pointer; color: var(--text-secondary);">✕</button>
+                                    </div>
+                                    <div class="wiz-search-results" id="tpl-add-search-results" style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;">
+                                        <!-- Filled dynamically via JS -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Selected attendee cards list at the bottom -->
+                            <div id="tpl-add-selected-list" style="display: grid; grid-template-columns: 1fr; gap: 10px; padding: 0; border: none; background: transparent; margin-top: 8px;">
+                                <!-- Filled dynamically via JS -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dialog-footer" style="margin-top: 8px; display: flex; justify-content: flex-end; gap: 8px;">
+                        <button type="button" id="btn-cancel-template" class="btn btn-secondary" style="border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 20px; background: var(--bg-color); color: var(--text-primary); font-weight: 600; cursor: pointer;">취소</button>
+                        <button type="submit" id="btn-submit-template" class="btn btn-primary" style="border: none; border-radius: 12px; padding: 12px 20px; background: var(--color-blue); color: #ffffff; font-weight: 600; cursor: pointer;">추가하기</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Constraint Popover for Calendar Cell (Hover backup) -->
+    <div id="cell-detail-popover" class="toss-popover" style="display: none;" role="tooltip">
+        <!-- Hydrated via JavaScript -->
+    </div>
+
+    <div id="schedule-edit-popover" class="toss-popover schedule-popover" style="display: none; position: absolute; z-index: 9999;" role="dialog">
+        <div class="popover-content" style="padding: 16px; width: 100%; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);" id="schedule-popover-title">일정 추가</span>
+            </div>
+            <div class="form-group" style="display: flex; flex-direction: column; gap: 4px;">
+                <input type="text" id="schedule-title-input" placeholder="일정 제목을 입력하세요." autocomplete="off" style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 10px; background: var(--bg-color); color: var(--text-primary); outline: none; font-size: 12px; box-sizing: border-box;">
+            </div>
+            <div class="form-group" style="display: flex; flex-direction: column; gap: 4px;">
+                <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">시간 지정</label>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                    <select id="schedule-start-select" style="flex: 1; border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 8px; background: var(--bg-color); color: var(--text-primary); font-size: 12px; outline: none; cursor: pointer; height: 32px; font-family: inherit;">
+                        <option value="0">09:00</option>
+                        <option value="1">10:00</option>
+                        <option value="2">11:00</option>
+                        <option value="3">12:00</option>
+                        <option value="4">13:00</option>
+                        <option value="5">14:00</option>
+                        <option value="6">15:00</option>
+                        <option value="7">16:00</option>
+                        <option value="8">17:00</option>
+                    </select>
+                    <span style="font-size: 12px; color: var(--text-tertiary);">~</span>
+                    <select id="schedule-end-select" style="flex: 1; border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 8px; background: var(--bg-color); color: var(--text-primary); font-size: 12px; outline: none; cursor: pointer; height: 32px; font-family: inherit;">
+                        <option value="1">10:00</option>
+                        <option value="2">11:00</option>
+                        <option value="3">12:00</option>
+                        <option value="4">13:00</option>
+                        <option value="5">14:00</option>
+                        <option value="6">15:00</option>
+                        <option value="7">16:00</option>
+                        <option value="8">17:00</option>
+                        <option value="9">18:00</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">카테고리</label>
+                <div class="category-chips-container" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+                    <button type="button" class="category-chip active" data-category="work" data-color="#3182f6" style="padding: 6px 0; font-size: 11px; border: 1.5px solid #3182f6; border-radius: 6px; background: rgba(49, 130, 246, 0.08); color: #3182f6; font-weight: 700; cursor: pointer; transition: all 0.2s;">업무</button>
+                    <button type="button" class="category-chip" data-category="personal" data-color="#a855f7" style="padding: 6px 0; font-size: 11px; border: 1.5px solid var(--border-color); border-radius: 6px; background: var(--bg-color); color: var(--text-secondary); font-weight: 600; cursor: pointer; transition: all 0.2s;">개인</button>
+                    <button type="button" class="category-chip" data-category="meeting" data-color="#f97316" style="padding: 6px 0; font-size: 11px; border: 1.5px solid var(--border-color); border-radius: 6px; background: var(--bg-color); color: var(--text-secondary); font-weight: 600; cursor: pointer; transition: all 0.2s;">미팅</button>
+                    <button type="button" class="category-chip" data-category="out" data-color="#f04452" style="padding: 6px 0; font-size: 11px; border: 1.5px solid var(--border-color); border-radius: 6px; background: var(--bg-color); color: var(--text-secondary); font-weight: 600; cursor: pointer; transition: all 0.2s;">외근</button>
+                </div>
+            </div>
+            <div class="form-group" style="display: flex; flex-direction: column; gap: 4px; position: relative;">
+                <label for="schedule-memo-input" style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">메모</label>
+                <div id="schedule-memo-input" contenteditable="true" placeholder="메모를 입력하세요. ('@이름' 혹은 초성 입력)" style="width: 100%; min-height: 60px; max-height: 120px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 10px; background: var(--bg-color); color: var(--text-primary); outline: none; font-size: 12px; font-family: inherit; box-sizing: border-box; text-align: left; line-height: 1.8; word-break: break-word;"></div>
+                <!-- Compact Mention Autocomplete Dropdown -->
+                <div id="mention-autocomplete-list" style="display: none; position: absolute; left: 0; bottom: 64px; width: 140px; max-height: 120px; overflow-y: auto; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); z-index: 10005; box-sizing: border-box; padding: 4px 0;"></div>
+            </div>
+            <div style="display: flex; gap: 6px; justify-content: flex-end; margin-top: 4px;">
+                <button type="button" id="btn-delete-schedule" class="btn btn-secondary" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; background: var(--bg-color); color: var(--text-primary); font-size: 11px; font-weight: 600; cursor: pointer; flex-grow: 1; display: none;">삭제</button>
+                <button type="button" id="btn-cancel-schedule" class="btn btn-secondary" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; background: var(--bg-color); color: var(--text-primary); font-size: 11px; font-weight: 600; cursor: pointer; flex-grow: 1;">취소</button>
+                <button type="button" id="btn-save-schedule" class="btn btn-primary" style="border: none; border-radius: 8px; padding: 8px 12px; background: var(--color-blue); color: #ffffff; font-size: 11px; font-weight: 600; cursor: pointer; flex-grow: 1;">추가</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toss-toast" role="alert" aria-live="assertive">
+        일정이 성공적으로 확정되었습니다!
+    </div>
+
+    <!-- Notification Popover -->
+    <div id="notification-popover" class="schedule-popover" style="display: none; position: absolute; width: 280px !important; padding: 12px 0; z-index: 1000; box-shadow: 0 10px 32px rgba(0,0,0,0.08); border-radius: 16px; border: 1px solid var(--border-color); background-color: var(--card-bg);">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 16px 12px; border-bottom: 1px solid var(--border-color);">
+            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">알림</span>
+            <button type="button" id="btn-clear-notifications" style="background: none; border: none; color: var(--color-blue); font-size: 11px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;">모두 읽음</button>
+        </div>
+        <div id="notification-list-container" style="display: flex; flex-direction: column; max-height: 240px; overflow-y: auto;">
+            <div style="padding: 24px; text-align: center; color: var(--text-secondary); font-size: 12px;">
+                새로운 알림이 없습니다.
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings / My Page Popover -->
+    <div id="settings-popover" class="schedule-popover" style="display: none; position: absolute; width: 260px !important; padding: 16px; z-index: 1000; box-shadow: 0 10px 32px rgba(0,0,0,0.08); border-radius: 16px; border: 1px solid var(--border-color); background-color: var(--card-bg); box-sizing: border-box;">
+        <!-- Profile Header -->
+        <div style="display: flex; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
+            <div class="quick-profile-badge" style="width: 40px; height: 40px; border-radius: 50%; background-color: var(--color-blue); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; flex-shrink: 0;">
+                김
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+                <span id="settings-user-name" style="font-size: 14px; font-weight: 700; color: var(--text-primary);">김토스</span>
+                <span id="settings-user-role" style="font-size: 11px; color: var(--text-secondary);">디자인1팀 / 팀장</span>
+            </div>
+        </div>
+        <!-- Settings Options -->
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Option 0: My Page Link -->
+            <button type="button" id="btn-open-mypage-link" style="width: 100%; text-align: left; background: none; border: none; font-size: 12px; font-weight: 600; color: var(--color-blue); cursor: pointer; padding: 4px 0 4px; border-bottom: none; display: flex; align-items: center; justify-content: space-between; font-family: inherit; outline: none; transition: opacity 0.2s;">
+                <span>마이페이지 보기</span>
+                <span>→</span>
+            </button>
+
+            <!-- Option 1: Calendar Sync -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);">Google Workspace 연동</span>
+                <label class="switch" style="position: relative; display: inline-block; width: 34px; height: 20px;">
+                    <input type="checkbox" id="settings-sync-toggle" checked style="opacity: 0; width: 0; height: 0;">
+                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;"></span>
+                </label>
+            </div>
+            <!-- Option 2: Slack Sync -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);">Slack 연동</span>
+                <label class="switch" style="position: relative; display: inline-block; width: 34px; height: 20px;">
+                    <input type="checkbox" id="settings-slack-toggle" checked style="opacity: 0; width: 0; height: 0;">
+                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;"></span>
+                </label>
+            </div>
+            <!-- Option 3: Dark Mode -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);">다크 모드</span>
+                <label class="switch" style="position: relative; display: inline-block; width: 34px; height: 20px;">
+                    <input type="checkbox" id="settings-theme-toggle" style="opacity: 0; width: 0; height: 0;">
+                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;"></span>
+                </label>
+            </div>
+            <!-- Logout Action -->
+            <button type="button" id="btn-settings-logout" style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; background: none; color: #f04452; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                로그아웃
+            </button>
+        </div>
+    </div>
+
+    <!-- My Page Slide-over Drawer (Default Hidden) -->
+    <div id="mypage-drawer" style="position: fixed; top: 0; right: -400px; width: 400px; height: 100vh; background-color: var(--card-bg); border-left: 1px solid var(--border-color); box-shadow: -10px 0 30px rgba(0,0,0,0.06); z-index: 8000; display: flex; flex-direction: column; transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-sizing: border-box; padding: 24px;">
+        <!-- Drawer Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px;">
+            <h2 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin: 0;">마이페이지</h2>
+            <button type="button" id="btn-close-mypage" style="background: none; border: none; font-size: 20px; color: var(--text-secondary); cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center;" title="닫기">✕</button>
+        </div>
+
+        <!-- Drawer Content -->
+        <div style="display: flex; flex-direction: column; gap: 24px; margin-top: 24px; overflow-y: auto; flex-grow: 1;">
+            <!-- Profile Card (Card Layout with profile details and account management menu list) -->
+            <div style="background-color: var(--card-bg); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); padding: 16px; border-radius: 14px; display: flex; flex-direction: column; gap: 14px;">
+                <!-- Profile Section -->
+                <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; width: 100%;">
+                    <!-- Avatar (Initials badge) - 72px -->
+                    <div class="quick-profile-badge" style="width: 72px; height: 72px; border-radius: 50%; background-color: var(--color-blue); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; box-shadow: 0 8px 16px rgba(49, 130, 246, 0.15);">
+                        김
+                    </div>
+                    <!-- Profile Details / Menu List -->
+                    <div id="mypage-profile-view" style="display: flex; flex-direction: column; align-items: center; gap: 2px; width: 100%;">
+                        <h3 id="mypage-user-name" style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin: 0 0 2px;">김토스</h3>
+                        <p id="mypage-user-role" style="font-size: 13px; color: var(--text-secondary); margin: 0;">디자인1팀 / 팀장</p>
+                        <p id="mypage-user-email" style="font-size: 11px; color: var(--text-tertiary); margin: 0; opacity: 0.85;">toss@toss.im</p>
+                        
+                        <!-- Account Management Menu List -->
+                        <div style="width: 100%; border-top: 1px solid var(--border-color); padding-top: 8px; margin-top: 8px; display: flex; flex-direction: column; gap: 2px;">
+                            <!-- Profile Edit Menu Item -->
+                            <button type="button" id="btn-edit-profile" style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px 4px; background: none; border: none; font-size: 13px; font-weight: 500; color: var(--text-primary); cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.6'" onmouseout="this.style.opacity='1'">
+                                <span>프로필 수정</span>
+                                <span style="color: var(--text-tertiary); font-size: 14px; font-weight: 400; font-family: monospace;">&gt;</span>
+                            </button>
+                            
+                            <!-- Password Change Menu Item -->
+                            <button type="button" style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px 4px; background: none; border: none; font-size: 13px; font-weight: 500; color: var(--text-primary); cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.6'" onmouseout="this.style.opacity='1'">
+                                <span>비밀번호 변경</span>
+                                <span style="color: var(--text-tertiary); font-size: 14px; font-weight: 400; font-family: monospace;">&gt;</span>
+                            </button>
+
+                            <!-- Logout Item -->
+                            <button type="button" onclick="document.getElementById('btn-settings-logout')?.click()" style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px 4px; background: none; border: none; font-size: 13px; font-weight: 500; color: #f04452; cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.6'" onmouseout="this.style.opacity='1'">
+                                <span>로그아웃</span>
+                                <span style="color: var(--text-tertiary); font-size: 14px; font-weight: 400; font-family: monospace;">&gt;</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Profile Edit Form (Toggled via JS) -->
+                    <div id="mypage-profile-edit" style="display: none; flex-direction: column; gap: 12px; width: 100%; border-top: 1px dashed var(--border-color); padding-top: 16px;">
+                        <div style="display: flex; flex-direction: column; gap: 4px; text-align: left;">
+                            <label style="font-size: 10px; font-weight: 600; color: var(--text-secondary);">이름</label>
+                            <input type="text" id="input-mypage-name" style="width: 100%; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 8px; background: var(--card-bg); color: var(--text-primary); font-size: 12px; outline: none; box-sizing: border-box;" value="김토스">
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 4px; text-align: left;">
+                            <label style="font-size: 10px; font-weight: 600; color: var(--text-secondary);">소속 / 직급</label>
+                            <input type="text" id="input-mypage-role" style="width: 100%; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 8px; background: var(--card-bg); color: var(--text-primary); font-size: 12px; outline: none; box-sizing: border-box;" value="디자인1팀 / 팀장">
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 4px; text-align: left;">
+                            <label style="font-size: 10px; font-weight: 600; color: var(--text-secondary);">이메일</label>
+                            <input type="email" id="input-mypage-email" style="width: 100%; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 8px; background: var(--card-bg); color: var(--text-primary); font-size: 12px; outline: none; box-sizing: border-box;" value="toss@toss.im">
+                        </div>
+                        <div style="display: flex; gap: 6px; margin-top: 4px;">
+                            <button type="button" id="btn-save-profile" style="flex: 1; border: none; border-radius: 6px; padding: 6px; background-color: var(--color-blue); color: white; font-size: 11px; font-weight: 600; cursor: pointer; transition: background-color 0.2s;">저장</button>
+                            <button type="button" id="btn-cancel-profile" style="flex: 1; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; background-color: var(--card-bg); color: var(--text-primary); font-size: 11px; font-weight: 600; cursor: pointer; transition: background-color 0.2s;">취소</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 1: 회의 선호 시간 -->
+            <div id="card-collab-settings" style="background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 12px; box-shadow: none; margin-top: 4px;">
+                <h4 style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin: 0 0 2px;">회의 선호 시간</h4>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <!-- Collab Days -->
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">요일</span>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <select id="collab-days-start" style="flex: 1; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 8px; background: var(--card-bg); color: var(--text-primary); font-size: 12px; outline: none; cursor: pointer; font-family: inherit; height: 32px;">
+                                <option value="월">월요일</option>
+                                <option value="화">화요일</option>
+                                <option value="수">수요일</option>
+                                <option value="목">목요일</option>
+                                <option value="금">금요일</option>
+                                <option value="토">토요일</option>
+                                <option value="일">일요일</option>
+                            </select>
+                            <span style="font-size: 12px; color: var(--text-tertiary);">~</span>
+                            <select id="collab-days-end" style="flex: 1; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 8px; background: var(--card-bg); color: var(--text-primary); font-size: 12px; outline: none; cursor: pointer; font-family: inherit; height: 32px;">
+                                <option value="월">월요일</option>
+                                <option value="화">화요일</option>
+                                <option value="수">수요일</option>
+                                <option value="목">목요일</option>
+                                <option value="금" selected>금요일</option>
+                                <option value="토">토요일</option>
+                                <option value="일">일요일</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Collab Hours -->
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">시간</span>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <select id="collab-hours-start" style="flex: 1; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 8px; background: var(--card-bg); color: var(--text-primary); font-size: 12px; outline: none; cursor: pointer; font-family: inherit; height: 32px;">
+                                <option value="9">09:00</option>
+                                <option value="10">10:00</option>
+                                <option value="11">11:00</option>
+                                <option value="12">12:00</option>
+                                <option value="13">13:00</option>
+                                <option value="14">14:00</option>
+                                <option value="15">15:00</option>
+                                <option value="16">16:00</option>
+                                <option value="17">17:00</option>
+                            </select>
+                            <span style="font-size: 12px; color: var(--text-tertiary);">~</span>
+                            <select id="collab-hours-end" style="flex: 1; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 8px; background: var(--card-bg); color: var(--text-primary); font-size: 12px; outline: none; cursor: pointer; font-family: inherit; height: 32px;">
+                                <option value="10">10:00</option>
+                                <option value="11">11:00</option>
+                                <option value="12">12:00</option>
+                                <option value="13">13:00</option>
+                                <option value="14">14:00</option>
+                                <option value="15">15:00</option>
+                                <option value="16">16:00</option>
+                                <option value="17">17:00</option>
+                                <option value="18" selected>18:00</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: 집중 시간 -->
+            <div id="card-exclude-settings" style="background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 12px; box-shadow: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h4 style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin: 0;">집중 시간</h4>
+                    <button id="btn-add-exclude-time" type="button" class="wiz-template-chip add-btn" style="color: var(--color-blue); border: 1px solid rgba(49, 130, 246, 0.3); background-color: rgba(49, 130, 246, 0.05); font-weight: 700; white-space: nowrap; flex-shrink: 0; padding: 4px 12px; font-size: 11px; border-radius: 9999px; cursor: pointer; transition: all 0.2s;" title="집중 시간 추가">+ 추가</button>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div style="font-size: 11px; color: var(--text-tertiary); line-height: 1.4; margin-bottom: 4px;">
+                        설정한 시간은 캘린더에 집중 시간으로 표시됩니다.
+                    </div>
+                    <!-- List of Excluded Times -->
+                    <div id="exclude-times-list" style="display: flex; flex-direction: column; gap: 8px;">
+                        <!-- Hydrated via JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Page Backdrop Overlay -->
+    <div id="mypage-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.4); z-index: 7999; backdrop-filter: blur(2px); transition: opacity 0.3s;"></div>
+
+    <!-- Stacking Notification Container on bottom-right -->
+    <div class="notification-container">
+        <!-- Bottom-left message popover (KakaoTalk PC style) -->
+        <div id="message-popover" class="message-popover" role="button" tabindex="0" aria-label="조율 요청 메시지 열기">
+            <div class="message-popover-header">
+                <div class="message-popover-avatar" style="background: rgba(139, 92, 246, 0.12) !important; color: #8b5cf6 !important; background-image: none !important;">이</div>
+                <div class="message-popover-meta">
+                    <span class="message-popover-sender">이토스</span>
+                    <span class="message-popover-time">방금 전</span>
+                </div>
+                <span class="message-popover-tag">일정 확인</span>
+            </div>
+            <div class="message-popover-body">
+                <span class="message-popover-title">디자인&개발 협업 미팅</span>
+                <span class="message-popover-desc">회의 일정을 정하는 중이에요.<br>가능한 시간을 선택해주세요.</span>
+            </div>
+            <div class="message-popover-cta">
+                <span>일정 선택하기</span>
+                <span class="message-popover-arrow">→</span>
+            </div>
+        </div>
+
+        <!-- Host Response Completed popover (stacks above message-popover) -->
+        <div id="host-response-popover" class="host-response-popover" role="button" tabindex="0" aria-label="의견 취합 완료 알림 열기">
+            <div class="message-popover-header">
+                <div class="message-popover-avatar" style="background-color: var(--color-blue); color: #ffffff;">✓</div>
+                <div class="message-popover-meta">
+                    <span class="message-popover-sender">디자인1팀 회의</span>
+                    <span class="message-popover-time">방금 전</span>
+                </div>
+                <span class="message-popover-tag" style="background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6;">취합 완료</span>
+            </div>
+            <div class="message-popover-body">
+                <span class="message-popover-title">응답이 모두 도착했습니다</span>
+                <span class="message-popover-desc">가장 선호하는 시간대를 확인하고 회의를 확정해보세요.</span>
+            </div>
+            <div class="message-popover-cta">
+                <span>결과 확인하기</span>
+                <span class="message-popover-arrow">→</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Javascript -->
+    <script src="app.js?v=241"></script>
+</body>
+</html>

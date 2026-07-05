@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toss Align - 최종 과제 제출용 서비스 흐름 & 기술 스펙</title>
+    <!-- Google Fonts for Clean Typography -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <style>
+        :root {
+            --toss-blue: #3182f6;
+            --toss-blue-light: rgba(49, 130, 246, 0.06);
+            --toss-blue-border: rgba(49, 130, 246, 0.15);
+            --toss-purple: #8b5cf6;
+            --toss-purple-light: rgba(139, 92, 246, 0.06);
+            --toss-purple-border: rgba(139, 92, 246, 0.15);
+            --text-primary: #191f28;
+            --text-secondary: #4e5968;
+            --text-muted: #8b95a1;
+            --bg-page: #f2f4f6;
+            --bg-card: #ffffff;
+            --border-color: #e5e8eb;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            letter-spacing: -0.4px;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            padding: 30px 0;
+            line-height: 1.6;
+        }
+
+        /* A4 Page Formatting - Scaled Up */
+        .a4-page {
+            width: 297mm;
+            height: 210mm;
+            padding: 16mm 22mm;
+            margin: 20px auto;
+            background: var(--bg-card);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+            box-sizing: border-box;
+            position: relative;
+            page-break-after: always;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Header block */
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 3px solid var(--toss-blue);
+            padding-bottom: 14px;
+        }
+
+        .logo-area {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .logo-symbol {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #3182f6, #00d2ff);
+            border-radius: 8px;
+        }
+
+        .logo-text {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-transform: lowercase;
+        }
+
+        .logo-tagline {
+            color: var(--toss-blue);
+            font-size: 12px;
+            font-weight: 700;
+            background-color: var(--toss-blue-light);
+            padding: 2px 10px;
+            border-radius: 30px;
+            margin-left: 8px;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-top: 8px;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1.5px solid var(--border-color);
+            padding-bottom: 6px;
+        }
+
+        .section-title::before {
+            content: "";
+            display: inline-block;
+            width: 4px;
+            height: 16px;
+            background-color: var(--toss-blue);
+            border-radius: 2px;
+        }
+
+        /* Landscape Flow Layouts (Page 1) */
+        .flow-grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .flow-box {
+            background-color: #f9fafb;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+        }
+
+        .flow-box-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .flow-box-title span {
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .flow-box-title .badge-host {
+            background-color: var(--toss-blue-light);
+            color: var(--toss-blue);
+            border: 1px solid var(--toss-blue-border);
+        }
+
+        .flow-box-title .badge-part {
+            background-color: var(--toss-purple-light);
+            color: var(--toss-purple);
+            border: 1px solid var(--toss-purple-border);
+        }
+
+        /* Step cards row */
+        .step-row-flex {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            gap: 4px;
+        }
+
+        .step-block {
+            flex: 1;
+            background-color: var(--bg-card);
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 10px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .step-num {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .step-txt {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .step-subtxt {
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-top: 3px;
+        }
+
+        /* Active highlight step block */
+        .step-block.highlighted-blue {
+            background: linear-gradient(135deg, var(--toss-blue), #5fa4ff);
+            border-color: var(--toss-blue);
+            color: #ffffff;
+        }
+        .step-block.highlighted-blue .step-num { color: rgba(255,255,255,0.7); }
+        .step-block.highlighted-blue .step-txt { color: #ffffff; }
+        .step-block.highlighted-blue .step-subtxt { color: rgba(255,255,255,0.9); }
+
+        .step-arrow-icon {
+            color: var(--text-muted);
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0 4px;
+        }
+
+        /* Double Column Details (Page 2) */
+        .side-by-side-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            flex-grow: 1;
+            margin-top: 10px;
+        }
+
+        /* Tables - Scaled Up */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+            background-color: var(--bg-card);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border-color);
+            line-height: 1.5;
+        }
+
+        th {
+            background-color: #f9fafb;
+            font-weight: 700;
+            color: var(--text-secondary);
+            border-top: 1.5px solid var(--border-color);
+            font-size: 13px;
+        }
+
+        /* Page 3 Tech spec columns */
+        .tech-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .tech-block-detail {
+            background-color: #f9fafb;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .tech-head {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tech-head::before {
+            content: "✓";
+            color: var(--toss-blue);
+            font-weight: 800;
+            font-size: 16px;
+        }
+
+        .tech-content-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .code-box-pre {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 11px;
+            margin-top: 10px;
+            overflow-x: auto;
+            line-height: 1.4;
+        }
+
+        .page-num {
+            position: absolute;
+            bottom: 6mm;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        /* Helper spacing classes to prevent empty space */
+        .content-body-wrap {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        /* Flow Diagram CSS */
+        .flow-diagram-container {
+            position: relative;
+            width: 900px;
+            height: 400px;
+            margin: 10px auto;
+            background-color: #ffffff;
+            border-radius: var(--radius-md);
+            overflow: visible;
+        }
+
+        .flow-svg {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .flow-node {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background-color: #ffffff;
+            border: 1.5px solid #b0b9c2;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.01);
+            z-index: 10;
+            padding: 4px 8px;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        .flow-node:hover {
+            border-color: var(--toss-blue);
+            box-shadow: 0 4px 12px rgba(49, 130, 246, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .flow-label {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            border: 1px solid #e5e8eb;
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-size: 10.5px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+            z-index: 5;
+            white-space: nowrap;
+        }
+
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
+        @media print {
+            body {
+                background: #ffffff;
+                padding: 0;
+                margin: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .a4-page {
+                margin: 0 !important;
+                box-shadow: none !important;
+                width: 297mm !important;
+                height: 210mm !important;
+                page-break-after: always !important;
+                page-break-inside: avoid !important;
+                border: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= PAGE 1: Overall Flow Overview ================= -->
+    <div class="a4-page" id="page-1">
+        <header>
+            <div class="logo-area">
+                <span class="logo-symbol"></span>
+                <span class="logo-text">toss align</span>
+                <span class="logo-tagline">사내 일정 조율 프로토타입</span>
+            </div>
+            <h1>서비스 프로세스 및 아키텍처 명세서</h1>
+            <p class="subtitle">토스 내부 협업 조율 솔루션 개발 과제 제출용 스펙 명세서</p>
+        </header>
+
+        <div class="content-body-wrap" style="margin-bottom: 0;">
+            <div class="section-title">서비스 통합 프로세스 흐름도 (Unified Service Flow)</div>
+            
+            <div class="flow-diagram-container">
+                <!-- SVG Connector Paths -->
+                <svg class="flow-svg" width="900" height="400" viewBox="0 0 900 400">
+                    <defs>
+                        <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#8b95a1"/>
+                        </marker>
+                        <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#3182f6"/>
+                        </marker>
+                    </defs>
+
+                    <!-- 1. SSO -> 2. Calendar -->
+                    <path d="M 280 107 V 145" stroke="#8b95a1" stroke-width="1.5" marker-end="url(#arrow)"/>
+                    
+                    <!-- 2. Calendar -> 3. Host Dashboard -->
+                    <path d="M 350 177 V 215" stroke="#3182f6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+                    
+                    <!-- 3. Host Dashboard -> 4. Ask All -->
+                    <path d="M 350 247 V 285" stroke="#3182f6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+                    
+                    <!-- 4. Ask All -> 5. Popover -->
+                    <path d="M 350 317 V 355" stroke="#3182f6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+                    
+                    <!-- 5. Popover -> 6. Confirm -->
+                    <path d="M 565 371 H 765 V 91 H 630" stroke="#8b95a1" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+                    
+                    <!-- 6. Confirm -> 2. Calendar -->
+                    <path d="M 400 107 V 145" stroke="#3182f6" stroke-width="1.5" fill="none" marker-end="url(#arrow-blue)"/>
+                    
+                    <!-- 2. Calendar -> 7. Participant Room (Dashed) -->
+                    <path d="M 235 161 H 110 V 26 H 315" stroke="#8b95a1" stroke-width="1.5" stroke-dasharray="4 4" fill="none" marker-end="url(#arrow)"/>
+
+                    <!-- 7. Participant Room -> 8. Modal -->
+                    <path d="M 585 26 H 765 V 75" stroke="#3182f6" stroke-width="1.5" fill="none" marker-end="url(#arrow-blue)"/>
+
+                    <!-- 8. Modal -> 2. Calendar -->
+                    <path d="M 765 107 V 196 H 420 V 177" stroke="#3182f6" stroke-width="1.5" fill="none" marker-end="url(#arrow-blue)"/>
+                </svg>
+
+                <!-- Flow Nodes (HTML absolute positioned) -->
+                <div class="flow-node" style="left: 315px; top: 10px; width: 270px; height: 32px;">7. 참여자 조율 대화방 (참석자 모드)</div>
+                <div class="flow-node" style="left: 210px; top: 75px; width: 140px; height: 32px;">1. SSO 로그인 화면</div>
+                <div class="flow-node" style="left: 370px; top: 75px; width: 260px; height: 32px;">6. 호스트 결과 확인 및 최종 시간 확정</div>
+                <div class="flow-node" style="left: 650px; top: 75px; width: 230px; height: 32px;">8. 회의 응답 전달 모달 & 완료 피드백</div>
+                <div class="flow-node" style="left: 235px; top: 145px; width: 230px; height: 32px; border-color: var(--toss-blue);">2. 내 일정 관리 (호스트 캘린더)</div>
+                <div class="flow-node" style="left: 235px; top: 215px; width: 230px; height: 32px;">3. 회의 일정 조율 (호스트 모드)</div>
+                <div class="flow-node" style="left: 235px; top: 285px; width: 230px; height: 32px;">4. 모두에게 물어보기 (투표 생성)</div>
+                <div class="flow-node" style="left: 295px; top: 355px; width: 270px; height: 32px;">5. 실시간 투표 취합 완료 알림 팝오버</div>
+
+                <!-- Label Boxes on Arrows -->
+                <div class="flow-label" style="left: 280px; top: 126px;">사번/이름 입력</div>
+                <div class="flow-label" style="left: 110px; top: 93px;">우측 하단 이토스 요청 팝오버 알림</div>
+                <div class="flow-label" style="left: 710px; top: 26px;">바쁜 시간대 및 선호 시간 클릭 응답</div>
+                <div class="flow-label" style="left: 610px; top: 196px;">내 캘린더에 추가</div>
+                <div class="flow-label" style="left: 350px; top: 196px;">'회의 시간 찾기' 클릭</div>
+                <div class="flow-label" style="left: 350px; top: 266px;">회의명/시간 설정 & 참석자 검색 추가</div>
+                <div class="flow-label" style="left: 350px; top: 336px;">개인 홈 복귀 후 3.5초 대기</div>
+                <div class="flow-label" style="left: 710px; top: 371px;">결과 확인하기 클릭</div>
+                <div class="flow-label" style="left: 400px; top: 126px;">회의 확정하기 클릭</div>
+            </div>
+        </div>
+
+        <div class="page-num">1 / 3</div>
+    </div>
+
+    <!-- ================= PAGE 2: Step-by-Step Details (Side by Side) ================= -->
+    <div class="a4-page" id="page-2">
+        <header>
+            <div class="logo-area">
+                <span class="logo-symbol"></span>
+                <span class="logo-text">toss align</span>
+                <span class="logo-tagline">사내 일정 조율 프로토타입</span>
+            </div>
+            <h1>시나리오별 세부 기능 명세</h1>
+        </header>
+
+        <div class="content-body-wrap">
+            <div class="side-by-side-details">
+                <!-- Left Side: Host Specifications -->
+                <div>
+                    <div class="flow-box-title" style="margin-bottom: 10px; font-size: 16px;">
+                        <span class="badge-host">호스트 여정 상세 사양</span>
+                    </div>
+                    <table style="border: 1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+                        <colgroup>
+                            <col style="width: 15%">
+                            <col style="width: 25%">
+                            <col style="width: 60%">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>단계</th>
+                                <th>화면 및 명칭</th>
+                                <th>상세 구현 작동 스펙</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1단계</strong></td>
+                                <td>일정 홈 (달력)</td>
+                                <td>사내 SSO 원터치 로그인 후 진입하며, 주간 캘린더에서 개인 일정을 관리합니다.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>2단계</strong></td>
+                                <td>호스트 대시보드</td>
+                                <td>"디자인1팀 회의" 퀵 템플릿 선택, 'ㄱㅌㅅ' -> '김토스' 지능형 초성 동료 검색 및 추가를 수행합니다.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>3단계</strong></td>
+                                <td>요청 전송</td>
+                                <td>히트맵을 확인하여 "모두에게 물어보기" 요청을 발송한 뒤 캘린더 홈으로 자동 이동합니다.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4단계</strong></td>
+                                <td>취합 알림 대기</td>
+                                <td>3.5초 뒤 보라색 테마의 "디자인1팀 회의 취합 완료 응답 도착" 팝오버 알림이 누적 노출됩니다.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>5단계</strong></td>
+                                <td>최종 확정</td>
+                                <td>팝오버 클릭 시 결과창으로 이동, 고정 크기(312x108px)의 100% 추천 시간을 클릭해 회의를 최종 확정합니다.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Right Side: Participant Specifications -->
+                <div>
+                    <div class="flow-box-title" style="margin-bottom: 10px; font-size: 16px;">
+                        <span class="badge-part">참여자 여정 상세 사양</span>
+                    </div>
+                    <table style="border: 1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+                        <colgroup>
+                            <col style="width: 15%">
+                            <col style="width: 25%">
+                            <col style="width: 60%">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>단계</th>
+                                <th>화면 및 명칭</th>
+                                <th>상세 구현 작동 스펙</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1단계</strong></td>
+                                <td>알림 수신 (홈)</td>
+                                <td>우측 하단에 상시 떠 있는 "이토스님의 회의 요청" 파란색 팝오버 알림을 클릭해 입장합니다.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>2단계</strong></td>
+                                <td>조율방 (참석자)</td>
+                                <td>개인 약속이 투영된 달력 상에서 이토스 제안 슬롯 중 참석 선호 시간대를 클릭해 표기합니다.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>3단계</strong></td>
+                                <td>응답 전송</td>
+                                <td>'이 시간으로 응답' 클릭 후 파란색 체크박스 이미지(`check.png`)와 완료 문구 모달 피드백을 수신합니다.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4단계</strong></td>
+                                <td>확정 알림 대기</td>
+                                <td>홈 복귀 후 4.5초 뒤 "디자인&개발 협업 미팅 최종 확정" 알림 카드가 우측 하단에 도착합니다.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>5단계</strong></td>
+                                <td>캘린더 추가</td>
+                                <td>"내 캘린더에 추가 →" 링크 클릭 시 금요일 10시 일정 블록이 자신의 달력 해당 구역에 자동 바인딩됩니다.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-num">2 / 3</div>
+    </div>
+
+    <!-- ================= PAGE 3: Technical Specs & Code Snippets ================= -->
+    <div class="a4-page" id="page-3">
+        <header>
+            <div class="logo-area">
+                <span class="logo-symbol"></span>
+                <span class="logo-text">toss align</span>
+                <span class="logo-tagline">사내 일정 조율 프로토타입</span>
+            </div>
+            <h1>구현 아키텍처 및 알고리즘 명세</h1>
+        </header>
+
+        <div class="content-body-wrap">
+            <div class="tech-columns">
+                <!-- Left Highlight: State Isolation & Stacking -->
+                <div>
+                    <div class="tech-block-detail" style="height: 100%; border: 1.5px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+                        <div class="tech-head">상태 격리 및 복원 프로세스 (Data Isolation & Reversion)</div>
+                        <div class="tech-content-desc">
+                            본 시스템은 호스트 모드의 멤버 데이터(`p2`: 윤디자, `p3`: 박디자 등)와 참여자 모드의 멤버 데이터(`p2`: 박개발, `p3`: 최마케터 등)가 전역 ID를 공유하여 사용합니다. 
+                            팝오버를 연속적으로 오가며 화면을 롤링할 때 전역 변수가 오염되어 6/6 빈 시간대(금요일 13시)가 깨지는 현상이 존재했습니다.
+                            <br>이를 방지하기 위해 <strong>대시보드 전송점, 취합 팝오버 클릭 시점 및 홈 복귀점</strong>에 `restoreScheduleData()` 헬퍼를 완전 바인딩하여 데이터 누출과 오염을 차단했습니다.
+                        </div>
+                        <div class="code-box-pre">
+// app.js에 설계된 일정 복원 아키텍처
+function restoreScheduleData() {
+    // 로컬 스토리지 toss_schedule_data 세이브 로드 시도
+    if (!loadScheduleDataFromLocalStorage()) {
+        initializeDefaultScheduleData(); // 실패 시 호스트 프리셋 로드
+    }
+}</div>
+                    </div>
+                </div>
+
+                <!-- Right Highlight: Spanning & Lunch Lock -->
+                <div style="display: flex; flex-direction: column; gap: 16px; justify-content: space-between;">
+                    <div class="tech-block-detail" style="flex-grow: 1; border: 1.5px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+                        <div class="tech-head">세로 셀 병합 알고리즘 (Vertical Spanning)</div>
+                        <div class="tech-content-desc">
+                            연속된 동일 범주의 약속이나 연차가 달력 칸칸이 쪼개지지 않고 깔끔한 단일 카드로 그려지도록 드로잉 모듈을 구축했습니다.
+                            병합 대상 첫 슬롯에 `rowspan` 속성을 동적으로 늘려 병합하고, 가려진 아래 칸들은 루프에서 렌더링을 패스 처리하는 알고리즘으로 설계되었습니다.
+                        </div>
+                    </div>
+
+                    <div class="tech-block-detail" style="flex-grow: 1; border: 1.5px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+                        <div class="tech-head">점심시간 비활성화 영역 (Lunch-Time Lockout)</div>
+                        <div class="tech-content-desc">
+                            매일 `12:00 - 13:00` 시간대는 기본 테이블의 CSS 클래스를 `status-lunch`로 통일하고 마우스 클릭 및 포커스 영역에서 완전 차단(`pointer-events: none`)하여 일정이 잘못 입력되는 케이스를 설계 레벨에서 원천 예방했습니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-num">3 / 3</div>
+    </div>
+
+</body>
+</html>
