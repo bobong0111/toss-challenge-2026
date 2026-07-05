@@ -34,20 +34,4 @@
 * **재조율 옵션**: 회의 시간 단축, 참석자 조정, 분할 회의 등 다양한 방법으로 새로운 시간대를 추천합니다.
 * **최적의 대안 제시**: 기존 일정을 최대한 유지하면서 회의 성사 가능성을 높입니다.
 
----
 
-## 🛠 사용 기술 스택
-* **Frontend**: Vanilla HTML5, Vanilla CSS3 (Custom Variables, CSS Flexbox & Grid, Glassmorphism Backdrop-filter)
-* **Logic**: Vanilla Javascript (HTML5 History API, KST Timezone helper, LocalStorage API)
-
----
-
-## 🚀 로컬 실행 방법
-
-별도의 복잡한 패키지 설치 없이 파이썬 내장 정적 서버를 이용해 바로 실행할 수 있습니다.
-
-```bash
-# 프로젝트 폴더로 이동 후 아래 명령 실행
-python3 -m http.server 8000
-```
-이후 브라우저에서 `http://localhost:8000`으로 접속하여 즉시 테스트할 수 있습니다.
