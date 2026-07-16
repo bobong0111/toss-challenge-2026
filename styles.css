@@ -283,6 +283,16 @@ input[type="text"]:focus, select:focus {
     box-shadow: 0 0 0 3px rgba(49, 130, 246, 0.15);
 }
 
+#wiz-meeting-name {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+}
+
+#wiz-meeting-name:focus {
+    border-color: var(--color-blue);
+}
+
+
 /* Button Styling */
 .btn {
     font-size: 13px;
