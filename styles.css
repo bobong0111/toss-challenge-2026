@@ -2989,8 +2989,9 @@ body.dark-mode .vote-avatar-dot {
 .config-card.read-only select {
     pointer-events: none !important;
     opacity: 0.6;
-    background-color: #f2f4f6 !important; /* 어두운 비활성 배경 */
+    background-color: #f2f4f6 !important; /* 어두운 비활성 배경 (라이트 모드) */
     border: 1px solid rgba(0, 0, 0, 0.04) !important;
+    color: var(--text-primary) !important;
     cursor: not-allowed !important;
 }
 .config-card.read-only input:focus,
@@ -2998,6 +2999,18 @@ body.dark-mode .vote-avatar-dot {
     border-color: rgba(0, 0, 0, 0.04) !important;
     box-shadow: none !important;
     background-color: #f2f4f6 !important;
+}
+
+body.dark-mode .config-card.read-only input,
+body.dark-mode .config-card.read-only select {
+    background-color: var(--bg-color) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-secondary) !important;
+}
+body.dark-mode .config-card.read-only input:focus,
+body.dark-mode .config-card.read-only select:focus {
+    background-color: var(--bg-color) !important;
+    border-color: var(--border-color) !important;
 }
 .config-card.read-only button {
     pointer-events: none !important;
