@@ -190,13 +190,10 @@ body.dark-mode .login-logo-img.logo-dark {
 body.dark-mode .sidebar-header .subtitle {
     color: #CDCDCD;
 }
-
 .badge-sync-status {
-    color: #17191D;
-}
-
-body.dark-mode .badge-sync-status {
-    color: #CDCDCD;
+    background-color: #f2f4f6 !important;
+    border-color: #e5e8eb !important;
+    color: #17191D !important;
 }
 
 
