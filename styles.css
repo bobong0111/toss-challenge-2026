@@ -150,9 +150,22 @@ body {
     user-select: none;
 }
 
-body.dark-mode .toss-logo-img {
-    filter: invert(1) hue-rotate(180deg) brightness(1.2);
+.logo-dark {
+    display: none !important;
 }
+
+body.dark-mode .logo-light {
+    display: none !important;
+}
+
+body.dark-mode .toss-logo-img.logo-dark {
+    display: block !important;
+}
+
+body.dark-mode .login-logo-img.logo-dark {
+    display: inline-block !important;
+}
+
 
 .toss-logo-row {
     display: flex;
@@ -2381,9 +2394,6 @@ body.dark-mode .login-card {
     object-fit: contain;
 }
 
-body.dark-mode .login-logo-img {
-    filter: invert(1) hue-rotate(180deg) brightness(1.2);
-}
 
 .login-title {
     font-size: 22px;
