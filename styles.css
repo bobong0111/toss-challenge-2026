@@ -3368,7 +3368,8 @@ body:not(.view-landing) .host-response-popover {
 }
 
 .wiz-template-chip.active img.wiz-tpl-icon:not(.no-invert) {
-    filter: brightness(0) invert(1) !important;
+    content: url('images/bookmark_white.png') !important;
+    filter: none !important;
 }
 
 /* Quick Profile Badges, Utility Profile and Message Popover Avatar Styling */
