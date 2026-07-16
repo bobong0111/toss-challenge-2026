@@ -187,6 +187,19 @@ body.dark-mode .login-logo-img.logo-dark {
     margin-top: 4px;
 }
 
+body.dark-mode .sidebar-header .subtitle {
+    color: #CDCDCD;
+}
+
+.badge-sync-status {
+    color: #17191D;
+}
+
+body.dark-mode .badge-sync-status {
+    color: #CDCDCD;
+}
+
+
 /* Common Card Design */
 .card {
     background-color: var(--card-bg);
