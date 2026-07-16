@@ -284,12 +284,16 @@ input[type="text"]:focus, select:focus {
 }
 
 #wiz-meeting-name {
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px !important;
+}
+
+body.dark-mode #wiz-meeting-name {
+    border: 1px solid #2a2d35 !important;
 }
 
 #wiz-meeting-name:focus {
-    border-color: var(--color-blue);
+    border-color: var(--color-blue) !important;
 }
 
 
